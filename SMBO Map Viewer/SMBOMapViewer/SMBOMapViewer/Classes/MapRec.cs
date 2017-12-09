@@ -15,23 +15,23 @@ namespace SMBOMapViewer
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class MapRec
     {
-        public string Name; //Max length defined as 60 in the VB6 source
-        public short Revision; //VB6 integers are 16 bits and longs are 32 bits
-        public byte Moral;
-        public short Up;
-        public short Down;
-        public short Left;
-        public short Right;
-        public string music;
+        public string Name; //Max length defined as 60 in the VB6 source //The name of the map
+        public short Revision; //VB6 integers are 16 bits and longs are 32 bits //The revision of the map; how many times it was edited
+        public byte Moral; //0 for non-PvP, 1 for PvP
+        public short Up; //Map number up from this map
+        public short Down; //Map number down from this map
+        public short Left; //Map number left from this map
+        public short Right; //Map number right from this map
+        public string music; //The name of the music track playing
         public short BootMap;
         public byte BootX;
         public byte BootY;
         public short Shop;
-        public byte Indoors;
-        public TileRec[,] Tile = new TileRec[Constants.MAX_MAPX, Constants.MAX_MAPY];
-        public short[] Npc = new short[15];
-        public byte[] SpawnX = new byte[15];
-        public byte[] SpawnY = new byte[15];
+        public byte Indoors; //0 for outside, 1 for indoors
+        public TileRec[,] Tile = new TileRec[Constants.MAX_MAPX, Constants.MAX_MAPY]; //Tile data
+        public short[] Npc = new short[15]; //NPC data
+        public byte[] SpawnX = new byte[15]; //NPC X position spawn data
+        public byte[] SpawnY = new byte[15]; //NPC Y position spawn data
         public string owner;
         public byte scrolling;
         public short Weather;
@@ -42,6 +42,9 @@ namespace SMBOMapViewer
             DrawTiles();
         }
 
+        /// <summary>
+        /// Draw all the tiles on the map.
+        /// </summary>
         public void DrawTiles()
         {
             for (int i = 0; i < Tile.GetLength(0); i++)
@@ -69,17 +72,18 @@ namespace SMBOMapViewer
 
             Vector2 renderPos = new Vector2(x * Constants.PIC_X, y * Constants.PIC_Y);
 
-            SpriteRenderer.Instance.Draw(ground.Tex, renderPos, ground.SourceRect, .3f);
-            SpriteRenderer.Instance.Draw(mask.Tex, renderPos, mask.SourceRect, .3f);
-            SpriteRenderer.Instance.Draw(mask2.Tex, renderPos, mask2.SourceRect, .3f);
-            SpriteRenderer.Instance.Draw(fringe.Tex, renderPos, fringe.SourceRect, .3f);
-            SpriteRenderer.Instance.Draw(fringe2.Tex, renderPos, fringe2.SourceRect, .3f);
+            //Render the layers
+            SpriteRenderer.Instance.Draw(ground.Tex, renderPos, ground.SourceRect);
+            SpriteRenderer.Instance.Draw(mask.Tex, renderPos, mask.SourceRect);
+            SpriteRenderer.Instance.Draw(mask2.Tex, renderPos, mask2.SourceRect);
+            SpriteRenderer.Instance.Draw(fringe.Tex, renderPos, fringe.SourceRect);
+            SpriteRenderer.Instance.Draw(fringe2.Tex, renderPos, fringe2.SourceRect);
         }
 
         /// <summary>
         /// Gets layer data on a tile.
         /// </summary>
-        /// <param name="tileLayer"></param>
+        /// <param name="tileLayer">An integer representing layers such as Ground, Mask, Mask2, Fringe, or Fringe2.</param>
         /// <param name="tileset">The tileset to get the tile from</param>
         /// <returns></returns>
         private CroppedTexture2D GetTileLayerData(int tileLayer, int tileset)
@@ -87,9 +91,8 @@ namespace SMBOMapViewer
             //Load the texture
             Texture2D tileSet = AssetManager.Instance.LoadRawTexture2D($"{Constants.MapTilesPath}Tiles{tileset}.bmp");
 
-            //Set the draw region
+            //Set the draw region; get the tile's region in the tile sheet
             Rectangle rect = Rectangle.Empty;
-
             rect.Y = (tileLayer / Constants.TILESINSHEETS) * Constants.PIC_Y;
             rect.Height = Constants.PIC_Y;
             rect.X = (tileLayer - (tileLayer / Constants.TILESINSHEETS) * Constants.TILESINSHEETS) * Constants.PIC_X;

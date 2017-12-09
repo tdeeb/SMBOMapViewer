@@ -11,6 +11,9 @@ using Microsoft.VisualBasic;
 
 namespace SMBOMapViewer
 {
+    /// <summary>
+    /// Loads maps.
+    /// </summary>
     public static class MapLoader
     {
         /// <summary>
@@ -99,40 +102,11 @@ namespace SMBOMapViewer
             return null;
         }
 
-        /*private static TileRec LoadTile(int fileNum)
-        {
-            TileRec tileRec = new TileRec();
-
-            FileSystem.FileGet(fileNum, ref tileRec.Ground);
-            FileSystem.FileGet(fileNum, ref tileRec.Mask);
-            FileSystem.FileGet(fileNum, ref tileRec.Anim);
-            FileSystem.FileGet(fileNum, ref tileRec.Mask2);
-            FileSystem.FileGet(fileNum, ref tileRec.M2Anim);
-            FileSystem.FileGet(fileNum, ref tileRec.Fringe);
-            FileSystem.FileGet(fileNum, ref tileRec.FAnim);
-            FileSystem.FileGet(fileNum, ref tileRec.Fringe2);
-            FileSystem.FileGet(fileNum, ref tileRec.F2Anim);
-            FileSystem.FileGet(fileNum, ref tileRec.Type);
-            FileSystem.FileGet(fileNum, ref tileRec.Data1);
-            FileSystem.FileGet(fileNum, ref tileRec.Data2);
-            FileSystem.FileGet(fileNum, ref tileRec.Data3);
-            tileRec.String1 = ConvertDynamicLengthString(fileNum);
-            tileRec.String2 = ConvertDynamicLengthString(fileNum);
-            tileRec.String3 = ConvertDynamicLengthString(fileNum);
-            FileSystem.FileGet(fileNum, ref tileRec.light);
-            FileSystem.FileGet(fileNum, ref tileRec.GroundSet);
-            FileSystem.FileGet(fileNum, ref tileRec.MaskSet);
-            FileSystem.FileGet(fileNum, ref tileRec.AnimSet);
-            FileSystem.FileGet(fileNum, ref tileRec.Mask2Set);
-            FileSystem.FileGet(fileNum, ref tileRec.M2AnimSet);
-            FileSystem.FileGet(fileNum, ref tileRec.FringeSet);
-            FileSystem.FileGet(fileNum, ref tileRec.FAnimSet);
-            FileSystem.FileGet(fileNum, ref tileRec.Fringe2Set);
-            FileSystem.FileGet(fileNum, ref tileRec.F2AnimSet);
-
-            return tileRec;
-        }*/
-
+        /// <summary>
+        /// Converts a VB6 dynamic length string stored in binary to a C# string.
+        /// </summary>
+        /// <param name="fileNum"></param>
+        /// <returns></returns>
         private static string ConvertDynamicLengthString(int fileNum)
         {
             //Get first 2 bytes for length information
@@ -141,12 +115,18 @@ namespace SMBOMapViewer
 
             FileSystem.FileGet(fileNum, ref array);
 
-            //The 0th index tells the length of the string
+            //The first byte tells the length of the string
             dStr = (byte[])array;
 
             return ConvertFixedLengthString(fileNum, dStr[0]);
         }
 
+        /// <summary>
+        /// Converts a VB6 fixed-length string stored in binary to a C# string.
+        /// </summary>
+        /// <param name="fileNum"></param>
+        /// <param name="length">The length of the fixed-length string.</param>
+        /// <returns></returns>
         private static string ConvertFixedLengthString(int fileNum, int length)
         {
             //Fixed length strings have a two-byte descriptor
@@ -155,14 +135,15 @@ namespace SMBOMapViewer
 
             FileSystem.FileGet(fileNum, ref array, StringIsFixedLength: true);
             strArray = (byte[])array;
-            //string thing = BitConverter.ToString(strArray);
-            //Console.WriteLine(thing);
 
             string na = System.Text.Encoding.UTF8.GetString(strArray);
 
             return na;
         }
 
+        /// <summary>
+        /// Converts a VB6 array stored in binary to a C# array.
+        /// </summary>
         private static T[] ConvertArray<T>(int fileNum, T[] array, bool isArrayDynamic)
         {
             Array arr = array;
@@ -171,6 +152,9 @@ namespace SMBOMapViewer
             return (T[])arr;
         }
 
+        /// <summary>
+        /// Converts a VB6 multi-dimensional array stored in binary to a C# array. This does not handle jagged arrays.
+        /// </summary>
         private static T[,] Convert2DArray<T>(int fileNum, T[,] array, bool isArrayDynamic)
         {
             Array arr = array;
@@ -196,14 +180,10 @@ namespace SMBOMapViewer
         {
             if (array == null) return;
 
-            //Console.WriteLine();
-
             for (int i = 0; i < array.Length; i++)
             {
                 Console.WriteLine(array[i]);
             }
-
-            //Console.WriteLine();
         }
     }
 }

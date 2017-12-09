@@ -79,9 +79,9 @@ namespace SMBOMapViewer
             spriteBatch.End();
         }
 
-        public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRect, float layer)
+        public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRect)
         {
-            Draw(texture, position, sourceRect, Color.White, 0f, Vector2.Zero, Vector2.One, layer);
+            Draw(texture, position, sourceRect, Color.White, 0f, Vector2.Zero, Vector2.One, .5f);
         }
 
         public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRect, Color color, float rotation, Vector2 origin, Vector2 scale, float layer)

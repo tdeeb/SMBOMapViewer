@@ -11,16 +11,47 @@ namespace SMBOMapViewer
     /// </summary>
     public class Main : Game
     {
-        GraphicsDeviceManager graphics;
+        private enum MapChangingMode
+        {
+            /// <summary>
+            /// Linearly goes through each map.
+            /// </summary>
+            Linear,
 
+            /// <summary>
+            /// Goes through the maps as if you were playing the game.
+            /// Up, Down, Left, and Right will go to the maps that connect to the current one, if a valid one exists.
+            /// </summary>
+            GameLike
+        }
+
+        private GraphicsDeviceManager graphics;
+
+        /// <summary>
+        /// The current map number.
+        /// </summary>
         private int MapNum = 1;
+    
+        /// <summary>
+        /// The current map loaded.
+        /// </summary>
         private MapRec CurMap = null;
 
+        /// <summary>
+        /// Whether we should take a screenshot this frame or not.
+        /// </summary>
         private bool ShouldScreenshot = false;
+
+        /// <summary>
+        /// The current map changing mode.
+        /// </summary>
+        private MapChangingMode MapMode = MapChangingMode.Linear;
 
         public Main()
         {
             graphics = new GraphicsDeviceManager(this);
+
+            IsMouseVisible = true;
         }
 
         /// <summary>
@@ -40,10 +71,6 @@ namespace SMBOMapViewer
             SpriteRenderer.Instance.AdjustWindowSize(new Vector2(Constants.PIC_X * Constants.MAX_MAPX, Constants.PIC_Y * Constants.MAX_MAPY));
 
             LoadMapWrapper(MapNum);
-            //if (CurMap != null)
-            //{
-            //    Console.WriteLine($"{CurMap.ToString()}");
-            //}
         }
 
         /// <summary>
@@ -82,6 +109,74 @@ namespace SMBOMapViewer
             SpriteRenderer.Instance.CleanUp();
         }
 
+        private void HandleMapChanging()
+        {
+            //Handle changing maps based on the mode
+            if (MapMode == MapChangingMode.Linear)
+            {
+                //Change maps with left and right
+                //Up and Down progress 10 maps at a time
+                if (Input.GetKeyDown(Keys.Left) == true)
+                {
+                    MapNum = Utility.Wrap(MapNum - 1, Constants.MIN_MAPNUM, Constants.MAX_MAPNUM);
+
+                    LoadMapWrapper(MapNum);
+                }
+                else if (Input.GetKeyDown(Keys.Up) == true)
+                {
+                    MapNum = Utility.Wrap(MapNum - 10, Constants.MIN_MAPNUM, Constants.MAX_MAPNUM);
+
+                    LoadMapWrapper(MapNum);
+                }
+                else if (Input.GetKeyDown(Keys.Right) == true)
+                {
+                    MapNum = Utility.Wrap(MapNum + 1, Constants.MIN_MAPNUM, Constants.MAX_MAPNUM);
+
+                    LoadMapWrapper(MapNum);
+                }
+                else if (Input.GetKeyDown(Keys.Down) == true)
+                {
+                    MapNum = Utility.Wrap(MapNum + 10, Constants.MIN_MAPNUM, Constants.MAX_MAPNUM);
+
+                    LoadMapWrapper(MapNum);
+                }
+            }
+            else
+            {
+                //This mode doesn't work if we don't have a map loaded
+                if (CurMap == null)
+                {
+                    return;
+                }
+
+                int newMapNum = 0;
+
+                if (Input.GetKeyDown(Keys.Up) == true)
+                {
+                    newMapNum = CurMap.Up;
+                }
+                else if (Input.GetKeyDown(Keys.Left) == true)
+                {
+                    newMapNum = CurMap.Left;
+                }
+                else if (Input.GetKeyDown(Keys.Down) == true)
+                {
+                    newMapNum = CurMap.Down;
+                }
+                else if (Input.GetKeyDown(Keys.Right) == true)
+                {
+                    newMapNum = CurMap.Right;
+                }
+
+                //Load the new map
+                if (newMapNum > 0)
+                {
+                    MapNum = newMapNum;
+                    LoadMapWrapper(MapNum);
+                }
+            }
+        }
+
         private void HandleInput()
         {
             //Space tells to take a screenshot
@@ -90,18 +185,17 @@ namespace SMBOMapViewer
                 ShouldScreenshot = true;
             }
 
-            //Change maps with left and right
-            if (Input.GetKeyDown(Keys.Left) == true)
-            {
-                MapNum = Utility.Wrap(MapNum - 1, Constants.MIN_MAPNUM, Constants.MAX_MAPNUM);
+            //Handle input for changing maps
+            HandleMapChanging();
 
-                LoadMapWrapper(MapNum);
+            //Toggle between map modes
+            if (Input.GetKeyDown(Keys.G) == true)
+            {
+                MapMode = MapChangingMode.GameLike;
             }
-            else if (Input.GetKeyDown(Keys.Right) == true)
+            else if (Input.GetKeyDown(Keys.L) == true)
             {
-                MapNum = Utility.Wrap(MapNum + 1, Constants.MIN_MAPNUM, Constants.MAX_MAPNUM);
-
-                LoadMapWrapper(MapNum);
+                MapMode = MapChangingMode.Linear;
             }
 
             //WASD pans the camera
@@ -172,13 +266,21 @@ namespace SMBOMapViewer
                 //Don't bother if the map isn't loaded
                 if (CurMap != null)
                 {
-                    //Wrap in using so it gets disposed
+                    //Wrap the texture in a using so it gets disposed
                     using (Texture2D tex = GetScreenshot())
                     {
-                        using (FileStream fstream = new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\image.png", FileMode.Create))
+                        //Open the file dialogue so you can name the file and place it wherever you want
+                        System.Windows.Forms.SaveFileDialog dialogue = new System.Windows.Forms.SaveFileDialog();
+                        dialogue.FileName = string.Empty;
+                        dialogue.Filter = "PNG (*.png)|*.png";
+
+                        if (dialogue.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
-                            Vector2 size = SpriteRenderer.Instance.WindowSize;
-                            tex.SaveAsPng(fstream, (int)size.X, (int)size.Y);
+                            using (FileStream fstream = new FileStream(dialogue.FileName, FileMode.Create))
+                            {
+                                Vector2 size = SpriteRenderer.Instance.WindowSize;
+                                tex.SaveAsPng(fstream, (int)size.X, (int)size.Y);
+                            }
                         }
                     }
                 }

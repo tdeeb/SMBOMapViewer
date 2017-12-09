@@ -13,32 +13,32 @@ namespace SMBOMapViewer
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 86)]
     public struct TileRec
     {
-        public int Ground; //VB6 integers are 16 bits and longs are 32 bits
-        public int Mask;
-        public int Anim;
-        public int Mask2;
-        public int M2Anim;
-        public int Fringe;
-        public int FAnim;
-        public int Fringe2;
-        public int F2Anim;
-        public byte Type;
-        public int Data1;
+        public int Ground; //VB6 integers are 16 bits and longs are 32 bits //Ground layer
+        public int Mask; //Mask layer
+        public int Anim; //Anim layer
+        public int Mask2; //Mask2 layer
+        public int M2Anim; //Mask2 anim layer
+        public int Fringe; //Fringe layer
+        public int FAnim; //Fringe anim layer
+        public int Fringe2; //Fringe2 layer
+        public int F2Anim; //Fringe2 anim layer
+        public byte Type; //Tile type
+        public int Data1; 
         public int Data2;
         public int Data3;
-        public string String1;
-        public string String2;
-        public string String3;
+        public string String1; //String used for signs
+        public string String2; //String used for signs
+        public string String3; //String used for signs
         public int light;
-        public byte GroundSet;
-        public byte MaskSet;
-        public byte AnimSet;
-        public byte Mask2Set;
-        public byte M2AnimSet;
-        public byte FringeSet;
-        public byte FAnimSet;
-        public byte Fringe2Set;
-        public byte F2AnimSet;
+        public byte GroundSet; //Ground tileset
+        public byte MaskSet; //Mask tileset
+        public byte AnimSet; //Anim tileset
+        public byte Mask2Set; //Mask2 tileset
+        public byte M2AnimSet; //Mask2 anim tileset
+        public byte FringeSet; //Fringe tileset
+        public byte FAnimSet; //Fringe anim tileset
+        public byte Fringe2Set; //Fringe2 tileset
+        public byte F2AnimSet; //Fringe2 anim tileset
 
         public override string ToString()
         {

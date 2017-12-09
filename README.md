@@ -12,8 +12,8 @@ You will need at least MonoGame 3.7 and Visual Studio 2017, but earlier versions
 
 ## Features
 * Press L to turn on Linear map changing (default) and G to turn on GameLike map changing. Linear goes through maps in order of map number, and GameLike mode goes through maps connected to other maps.
-** In Linear mode, press the Left arrow key to go down a map number and press the Right arrow key to go up a map number. The Up and Down arrow keys go down and up, respectively, by 10 maps.
-** In GameLike mode, pressing an arrow key will go where the map would lead in the actual game. This doesn't work for warp tiles and there may be maps that aren't linked, so you will need to switch to Linear mode to get out of these maps.
+    * In Linear mode, press the Left arrow key to go down a map number and press the Right arrow key to go up a map number. The Up and Down arrow keys go down and up, respectively, by 10 maps.
+    * In GameLike mode, pressing an arrow key will go where the map would lead in the actual game. This doesn't work for warp tiles and there may be maps that aren't linked, so you will need to switch to Linear mode to get out of these maps.
 * Use WASD to translate the camera.
 * Use the + and - keys to zoom into and out of the map.
 * Press R to reset the camera.

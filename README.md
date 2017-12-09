@@ -17,6 +17,7 @@ You will need at least MonoGame 3.7 and Visual Studio 2017, but earlier versions
 * Use WASD to translate the camera.
 * Use the + and - keys to zoom into and out of the map.
 * Press R to reset the camera.
+* Press O to toggle whether or not to render tiles hidden by roofs. There aren't many of these in SMBO. If you want to see an example, Map 14 utilizes roofs.
 * Press Space to take a screenshot of the currently displayed map. You will be prompted what to name the file and where to save it. Keep in mind that if you've manipulated the camera, those manipulations will show up in the screenshot as well. Reset the camera with R before taking a screenshot to avoid this.
 
 ## Author(s)

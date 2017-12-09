@@ -198,6 +198,12 @@ namespace SMBOMapViewer
                 MapMode = MapChangingMode.Linear;
             }
 
+            //Toggle roof tiles with O
+            else if (Input.GetKeyDown(Keys.O) == true)
+            {
+                MapControlSettings.ShowHiddenRoofTiles = !MapControlSettings.ShowHiddenRoofTiles;
+            }
+
             //WASD pans the camera
             if (Input.GetKey(Keys.A) == true)
             {

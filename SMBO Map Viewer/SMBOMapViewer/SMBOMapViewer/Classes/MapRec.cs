@@ -63,12 +63,13 @@ namespace SMBOMapViewer
         /// <param name="y">The Y index of the tile.</param>
         public void DrawTile(int x, int y)
         {
+            TileRec tile = Tile[x, y];
+
             //Get all tile layers and draw them
-            CroppedTexture2D ground = GetTileLayerData(Tile[x, y].Ground, Tile[x, y].GroundSet);
-            CroppedTexture2D mask = GetTileLayerData(Tile[x, y].Mask, Tile[x, y].MaskSet);
-            CroppedTexture2D mask2 = GetTileLayerData(Tile[x, y].Mask2, Tile[x, y].Mask2Set);
-            CroppedTexture2D fringe = GetTileLayerData(Tile[x, y].Fringe, Tile[x, y].FringeSet);
-            CroppedTexture2D fringe2 = GetTileLayerData(Tile[x, y].Fringe2, Tile[x, y].Fringe2Set);
+            CroppedTexture2D ground = GetTileLayerData(tile.Ground, tile.GroundSet);
+            CroppedTexture2D mask = GetTileLayerData(tile.Mask, tile.MaskSet);
+            CroppedTexture2D mask2 = GetTileLayerData(tile.Mask2, tile.Mask2Set);
+            CroppedTexture2D fringe = GetTileLayerData(tile.Fringe, tile.FringeSet);
 
             Vector2 renderPos = new Vector2(x * Constants.PIC_X, y * Constants.PIC_Y);
 
@@ -77,7 +78,13 @@ namespace SMBOMapViewer
             SpriteRenderer.Instance.Draw(mask.Tex, renderPos, mask.SourceRect);
             SpriteRenderer.Instance.Draw(mask2.Tex, renderPos, mask2.SourceRect);
             SpriteRenderer.Instance.Draw(fringe.Tex, renderPos, fringe.SourceRect);
-            SpriteRenderer.Instance.Draw(fringe2.Tex, renderPos, fringe2.SourceRect);
+
+            //Check if we should render tiles hidden by roofs or not
+            if (MapControlSettings.ShowHiddenRoofTiles == false || tile.Type != Constants.ROOF_TILE)
+            {
+                CroppedTexture2D fringe2 = GetTileLayerData(tile.Fringe2, tile.Fringe2Set);
+                SpriteRenderer.Instance.Draw(fringe2.Tex, renderPos, fringe2.SourceRect);
+            }
         }
 
         /// <summary>

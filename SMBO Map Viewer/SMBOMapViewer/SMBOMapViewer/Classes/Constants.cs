@@ -15,6 +15,11 @@ namespace SMBOMapViewer
         public const string MapTilesPath = "Content/Tiles/";
         public const string MapDataPath = "Content/MapData/";
 
+        /// <summary>
+        /// The TileType value for Roof tiles
+        /// </summary>
+        public const byte ROOF_TILE = 28;
+
         public const int MAX_MAPX = 30;
         public const int MAX_MAPY = 30;
         public const int PIC_X = 32;

@@ -53,6 +53,7 @@
     <Compile Include="Classes\MapControlSettings.cs" />
     <Compile Include="Classes\SpriteRenderer.cs" />
     <Compile Include="Classes\TileRec.cs" />
+    <Compile Include="Classes\Time.cs" />
     <Compile Include="Classes\Utility.cs" />
     <Compile Include="Interfaces\ICleanup.cs" />
     <Compile Include="Program.cs" />

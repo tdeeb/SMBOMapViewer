@@ -15,5 +15,10 @@ namespace SMBOMapViewer
         /// Whether to show tiles hidden by roofs or not.
         /// </summary>
         public static bool ShowHiddenRoofTiles = false;
+
+        /// <summary>
+        /// Whether to render the map's animation tiles or the mask tiles.
+        /// </summary>
+        public static bool RenderAnimTiles = false;
     }
 }

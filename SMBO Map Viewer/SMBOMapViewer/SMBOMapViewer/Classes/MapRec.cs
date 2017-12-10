@@ -67,22 +67,22 @@ namespace SMBOMapViewer
 
             //Get all tile layers and draw them
             CroppedTexture2D ground = GetTileLayerData(tile.Ground, tile.GroundSet);
-            CroppedTexture2D mask = GetTileLayerData(tile.Mask, tile.MaskSet);
-            CroppedTexture2D mask2 = GetTileLayerData(tile.Mask2, tile.Mask2Set);
-            CroppedTexture2D fringe = GetTileLayerData(tile.Fringe, tile.FringeSet);
+            CroppedTexture2D maskOrAnim = GetMaskOrAnimLayer(tile.Mask, tile.MaskSet, tile.Anim, tile.AnimSet);
+            CroppedTexture2D mask2OrAnim2 = GetMaskOrAnimLayer(tile.Mask2, tile.Mask2Set, tile.M2Anim, tile.M2AnimSet);
+            CroppedTexture2D fringe = GetMaskOrAnimLayer(tile.Fringe, tile.FringeSet, tile.FAnim, tile.FAnimSet);
 
             Vector2 renderPos = new Vector2(x * Constants.PIC_X, y * Constants.PIC_Y);
 
             //Render the layers
             SpriteRenderer.Instance.Draw(ground.Tex, renderPos, ground.SourceRect);
-            SpriteRenderer.Instance.Draw(mask.Tex, renderPos, mask.SourceRect);
-            SpriteRenderer.Instance.Draw(mask2.Tex, renderPos, mask2.SourceRect);
+            SpriteRenderer.Instance.Draw(maskOrAnim.Tex, renderPos, maskOrAnim.SourceRect);
+            SpriteRenderer.Instance.Draw(mask2OrAnim2.Tex, renderPos, mask2OrAnim2.SourceRect);
             SpriteRenderer.Instance.Draw(fringe.Tex, renderPos, fringe.SourceRect);
 
             //Check if we should render tiles hidden by roofs or not
             if (MapControlSettings.ShowHiddenRoofTiles == false || tile.Type != Constants.ROOF_TILE)
             {
-                CroppedTexture2D fringe2 = GetTileLayerData(tile.Fringe2, tile.Fringe2Set);
+                CroppedTexture2D fringe2 = GetMaskOrAnimLayer(tile.Fringe2, tile.Fringe2Set, tile.F2Anim, tile.F2AnimSet);//GetTileLayerData(tile.Fringe2, tile.Fringe2Set);
                 SpriteRenderer.Instance.Draw(fringe2.Tex, renderPos, fringe2.SourceRect);
             }
         }
@@ -106,6 +106,26 @@ namespace SMBOMapViewer
             rect.Width = Constants.PIC_X;
 
             return new CroppedTexture2D(tileSet, rect);
+        }
+
+        /// <summary>
+        /// Returns either the associated mask or animation layer based on the global map animation timer.
+        /// </summary>
+        /// <param name="maskLayer">The mask layer for the tile.</param>
+        /// <param name="maskTileset">The mask tileset for the tile.</param>
+        /// <param name="animLayer">The animation layer for the tile.</param>
+        /// <param name="animTileset">The animation tileset for the tile.</param>
+        /// <returns>A CroppedTexture2D holding either the mask or animation layer.</returns>
+        private CroppedTexture2D GetMaskOrAnimLayer(int maskLayer, int maskTileset, int animLayer, int animTileset)
+        {
+            //If we shouldn't render animation tiles or there isn't an animation layer, return the mask
+            if (MapControlSettings.RenderAnimTiles == false || animLayer <= 0)
+            {
+                return GetTileLayerData(maskLayer, maskTileset);
+            }
+
+            //Otherwise, return the animation
+            return GetTileLayerData(animLayer, animTileset);
         }
 
         public override string ToString()

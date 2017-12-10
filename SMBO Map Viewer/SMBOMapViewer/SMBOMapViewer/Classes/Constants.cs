@@ -28,5 +28,10 @@ namespace SMBOMapViewer
 
         public const int MIN_MAPNUM = 1;
         public const int MAX_MAPNUM = 350;
+
+        /// <summary>
+        /// How often map animations are updated.
+        /// </summary>
+        public const double MAP_ANIM_TIMER = 250d;
     }
 }

@@ -47,6 +47,8 @@ namespace SMBOMapViewer
         /// </summary>
         private MapChangingMode MapMode = MapChangingMode.Linear;
 
+        private double MapAnimTracker = 0d;
+
         public Main()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -250,6 +252,16 @@ namespace SMBOMapViewer
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            Time.UpdateTime(gameTime);
+
+            //Handle changing the map animation
+            MapAnimTracker += Time.ElapsedMilliseconds;
+            if (MapAnimTracker >= Constants.MAP_ANIM_TIMER)
+            {
+                MapControlSettings.RenderAnimTiles = !MapControlSettings.RenderAnimTiles;
+                MapAnimTracker = 0d;
+            }
+
             HandleInput();
 
             Input.UpdateInputState();

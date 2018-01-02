@@ -289,7 +289,7 @@ namespace SMBOMapViewer
                     {
                         //Open the file dialogue so you can name the file and place it wherever you want
                         System.Windows.Forms.SaveFileDialog dialogue = new System.Windows.Forms.SaveFileDialog();
-                        dialogue.FileName = string.Empty;
+                        dialogue.FileName = $"Map {MapNum} - {CurMap.Name.TrimEnd(' ')}";
                         dialogue.Filter = "PNG (*.png)|*.png";
 
                         if (dialogue.ShowDialog() == System.Windows.Forms.DialogResult.OK)

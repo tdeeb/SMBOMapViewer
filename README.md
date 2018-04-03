@@ -3,7 +3,7 @@ A map viewer to view maps from the fangame, Super Mario Bros. Online.
 
 
 ## Overview
-This program reads in the binary map files from the Super Mario Bros. Online fangame (http://supermariobrosonline.tk/) and displays them. The map data was originally written to binary files in Visual Basic 6, so this program uses legacy file system methods to decode it.
+This program reads in the binary map files from the Super Mario Bros. Online fangame (http://supermariobrosonline.tk/) and displays them. The map data was originally written to binary files in Visual Basic 6, so this program uses legacy file system methods to decode it. This should also work for other games made in the Eclipse engine, provided you have the tilesets to display them properly.
 
 All SMBO maps and tilesets are included in the project.
 
@@ -18,7 +18,7 @@ You will need at least MonoGame 3.7 and Visual Studio 2017, but earlier versions
 * Use the + and - keys to zoom into and out of the map.
 * Press R to reset the camera.
 * Press O to toggle whether or not to render tiles hidden by roofs. There aren't many of these in SMBO. If you want to see an example, Map 14 utilizes roofs.
-* Press Space to take a screenshot of the currently displayed map. You will be prompted what to name the file and where to save it. Keep in mind that if you've manipulated the camera, those manipulations will show up in the screenshot as well. Reset the camera with R before taking a screenshot to avoid this.
+* Press Space to take a screenshot of the currently displayed map. You will be prompted what to name the file and where to save it. Map names with question marks in them are automatically replaced with spaces, since you cannot have a question mark in a file name. As of the current version, the produced screenshot will ignore any manipulations to the camera, so you no longer need to reset the camera before taking a screenshot.
 
 ## Author(s)
 * **Thomas Deeb (aka Kimimaru)**

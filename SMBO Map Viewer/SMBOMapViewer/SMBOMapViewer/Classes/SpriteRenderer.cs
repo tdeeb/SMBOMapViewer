@@ -34,7 +34,10 @@ namespace SMBOMapViewer
         public Vector2 WindowSize => new Vector2(graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
 
         public GraphicsDeviceManager graphicsDeviceManager { get; private set; } = null;
+        public GraphicsDevice graphicsDevice => graphicsDeviceManager.GraphicsDevice;
         private SpriteBatch spriteBatch = null;
+
+        public RenderTarget2D RenderTarget { get; private set; } = null;
 
         private SpriteRenderer()
         {
@@ -45,6 +48,7 @@ namespace SMBOMapViewer
         {
             graphicsDeviceManager.Dispose();
             spriteBatch.Dispose();
+            RenderTarget.Dispose();
 
             instance = null;
         }
@@ -52,7 +56,9 @@ namespace SMBOMapViewer
         public void Initialize(GraphicsDeviceManager graphics)
         {
             graphicsDeviceManager = graphics;
-            spriteBatch = new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
+            spriteBatch = new SpriteBatch(graphicsDevice);
+
+            RenderTarget = new RenderTarget2D(graphicsDevice, Constants.PIC_X * Constants.MAX_MAPX, Constants.PIC_Y * Constants.MAX_MAPY);
         }
 
         /// <summary>
@@ -61,21 +67,45 @@ namespace SMBOMapViewer
         /// <param name="newWindowSize">The new size of the window</param>
         public void AdjustWindowSize(Vector2 newWindowSize)
         {
-            graphicsDeviceManager.PreferredBackBufferWidth = (int)newWindowSize.X;
-            graphicsDeviceManager.PreferredBackBufferHeight = (int)newWindowSize.Y;
+            int width = (int)newWindowSize.X;
+            int height = (int)newWindowSize.Y;
+
+            graphicsDeviceManager.PreferredBackBufferWidth = width;
+            graphicsDeviceManager.PreferredBackBufferHeight = height;
+
+            //Adjust RenderTarget size if the screen size changed
+            if (width != RenderTarget.Width || height != RenderTarget.Height)
+            {
+                RenderTarget.Dispose();
+                RenderTarget = new RenderTarget2D(graphicsDevice, width, height);
+            }
 
             graphicsDeviceManager.ApplyChanges();
         }
         
         public void BeginDrawing()
         {
-            graphicsDeviceManager.GraphicsDevice.Clear(Color.CornflowerBlue);
+            //Set RenderTarget
+            graphicsDevice.SetRenderTarget(RenderTarget);
+            graphicsDevice.Clear(Color.Black);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Camera.Instance.CalculateTransformation());
+            //Render without the matrix so the RenderTarget has the raw map data on it
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null);
         }
 
         public void EndDrawing()
         {
+            spriteBatch.End();
+
+            //Render to the back buffer
+            graphicsDevice.SetRenderTarget(null);
+            graphicsDevice.Clear(Color.Black);
+
+            //Draw the RenderTarget with the matrix so the modifications are shown on the back buffer but not on the RenderTarget
+            spriteBatch.Begin(SpriteSortMode.Texture, BlendState.Opaque, SamplerState.PointClamp, transformMatrix: Camera.Instance.CalculateTransformation());
+
+            Draw(RenderTarget, Vector2.Zero, null);
+
             spriteBatch.End();
         }
 

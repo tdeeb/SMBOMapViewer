@@ -277,39 +277,40 @@ namespace SMBOMapViewer
                     
             //Render maps in a separate method
             MapRender();
-            
-            //Capture a screenshot if so
-            if (ShouldScreenshot == true)
-            {
-                //Don't bother if the map isn't loaded
-                if (CurMap != null)
-                {
-                    //Wrap the texture in a using so it gets disposed
-                    using (Texture2D tex = GetScreenshot())
-                    {
-                        //Open the file dialogue so you can name the file and place it wherever you want
-                        System.Windows.Forms.SaveFileDialog dialogue = new System.Windows.Forms.SaveFileDialog();
-                        dialogue.FileName = $"Map {MapNum} - {CurMap.Name.TrimEnd(' ')}";
-                        dialogue.Filter = "PNG (*.png)|*.png";
-
-                        if (dialogue.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                        {
-                            using (FileStream fstream = new FileStream(dialogue.FileName, FileMode.Create))
-                            {
-                                Vector2 size = SpriteRenderer.Instance.WindowSize;
-                                tex.SaveAsPng(fstream, (int)size.X, (int)size.Y);
-                            }
-                        }
-                    }
-                }
-
-                //Clear flag
-                ShouldScreenshot = false;
-            }
 
             PostRender();
 
             SpriteRenderer.Instance.EndDrawing();
+
+            //Capture a screenshot if so
+            if (ShouldScreenshot == true)
+            {
+                ShouldScreenshot = false;
+
+                //Don't bother if the map isn't loaded
+                if (CurMap != null)
+                {
+                    //Save the RenderTexture
+                    Texture2D tex = SpriteRenderer.Instance.RenderTarget;
+
+                    //Open the file dialogue so you can name the file and place it wherever you want
+                    System.Windows.Forms.SaveFileDialog dialogue = new System.Windows.Forms.SaveFileDialog();
+                    
+                    //Several maps have question marks in their names
+                    //Questions marks can't be in filenames, so if you encounter one, replace it with a space
+                    //If you try to save an invalid filename, there's no feedback, so this is how we're avoiding that problem
+                    dialogue.FileName = $"Map {MapNum} - {CurMap.Name.TrimEnd(' ').Replace('?', ' ')}";
+                    dialogue.Filter = "PNG (*.png)|*.png";
+
+                    if (dialogue.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        using (FileStream fstream = new FileStream(dialogue.FileName, FileMode.Create))
+                        {
+                            tex.SaveAsPng(fstream, tex.Width, tex.Height);
+                        }
+                    }
+                }
+            }
 
             base.Draw(gameTime);
         }
@@ -330,12 +331,12 @@ namespace SMBOMapViewer
 
         }
 
-        private Texture2D GetScreenshot()
+        /*private Texture2D GetScreenshot()
         {
             int w, h;
             w = GraphicsDevice.PresentationParameters.BackBufferWidth;
             h = GraphicsDevice.PresentationParameters.BackBufferHeight;
-            
+
             //Present what's drawn
             GraphicsDevice.Present();
 
@@ -346,6 +347,6 @@ namespace SMBOMapViewer
             screenshot.SetData(backbuffer);
 
             return screenshot;
-        }
+        }*/
     }
 }

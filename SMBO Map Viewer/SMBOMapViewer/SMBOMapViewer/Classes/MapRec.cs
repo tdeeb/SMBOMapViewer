@@ -82,7 +82,7 @@ namespace SMBOMapViewer
             //Check if we should render tiles hidden by roofs or not
             if (MapControlSettings.ShowHiddenRoofTiles == false || tile.Type != Constants.ROOF_TILE)
             {
-                CroppedTexture2D fringe2 = GetMaskOrAnimLayer(tile.Fringe2, tile.Fringe2Set, tile.F2Anim, tile.F2AnimSet);//GetTileLayerData(tile.Fringe2, tile.Fringe2Set);
+                CroppedTexture2D fringe2 = GetMaskOrAnimLayer(tile.Fringe2, tile.Fringe2Set, tile.F2Anim, tile.F2AnimSet);
                 SpriteRenderer.Instance.Draw(fringe2.Tex, renderPos, fringe2.SourceRect);
             }
         }

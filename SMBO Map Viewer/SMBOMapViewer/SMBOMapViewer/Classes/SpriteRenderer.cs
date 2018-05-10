@@ -73,13 +73,6 @@ namespace SMBOMapViewer
             graphicsDeviceManager.PreferredBackBufferWidth = width;
             graphicsDeviceManager.PreferredBackBufferHeight = height;
 
-            //Adjust RenderTarget size if the screen size changed
-            if (width != RenderTarget.Width || height != RenderTarget.Height)
-            {
-                RenderTarget.Dispose();
-                RenderTarget = new RenderTarget2D(graphicsDevice, width, height);
-            }
-
             graphicsDeviceManager.ApplyChanges();
         }
         

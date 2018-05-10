@@ -54,6 +54,7 @@ namespace SMBOMapViewer
             graphics = new GraphicsDeviceManager(this);
 
             IsMouseVisible = true;
+            Window.AllowUserResizing = true;
         }
 
         /// <summary>
@@ -70,7 +71,7 @@ namespace SMBOMapViewer
             SpriteRenderer.Instance.Initialize(graphics);
             Camera.Instance.Initialize(Vector2.Zero, 0f, 1);
 
-            SpriteRenderer.Instance.AdjustWindowSize(new Vector2(Constants.PIC_X * Constants.MAX_MAPX, Constants.PIC_Y * Constants.MAX_MAPY));
+            SpriteRenderer.Instance.AdjustWindowSize(new Vector2((Constants.PIC_X * (Constants.MAX_MAPX - 10)), (Constants.PIC_Y * (Constants.MAX_MAPY / 2))));
 
             LoadMapWrapper(MapNum);
         }
@@ -330,23 +331,5 @@ namespace SMBOMapViewer
         {
 
         }
-
-        /*private Texture2D GetScreenshot()
-        {
-            int w, h;
-            w = GraphicsDevice.PresentationParameters.BackBufferWidth;
-            h = GraphicsDevice.PresentationParameters.BackBufferHeight;
-
-            //Present what's drawn
-            GraphicsDevice.Present();
-
-            int[] backbuffer = new int[w * h];
-            GraphicsDevice.GetBackBufferData(backbuffer);
-
-            Texture2D screenshot = new Texture2D(GraphicsDevice, w, h, false, GraphicsDevice.PresentationParameters.BackBufferFormat);
-            screenshot.SetData(backbuffer);
-
-            return screenshot;
-        }*/
     }
 }

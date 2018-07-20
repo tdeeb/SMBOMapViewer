@@ -50,39 +50,92 @@ namespace SMBOMapViewer
 
             int fileNum = -1;
 
+            BinaryReader binaryReader = null;
+
             try
             {
-                //Get next available file num from freefile
-                fileNum = FileSystem.FreeFile();
-
-                //Console.WriteLine($"fileNum is {fileNum}");
-
                 MapRec mapRec = new MapRec();
 
-                //Read the data from the file
-                FileSystem.FileOpen(fileNum, fileName, OpenMode.Binary);
+                binaryReader = new BinaryReader(new FileStream(fileName, FileMode.Open), Encoding.ASCII);
 
                 //Read in all data
-                mapRec.Name = ConvertFixedLengthString(fileNum, 60);
-                FileSystem.FileGet(fileNum, ref mapRec.Revision);
-                FileSystem.FileGet(fileNum, ref mapRec.Moral);
-                FileSystem.FileGet(fileNum, ref mapRec.Up);
-                FileSystem.FileGet(fileNum, ref mapRec.Down);
-                FileSystem.FileGet(fileNum, ref mapRec.Left);
-                FileSystem.FileGet(fileNum, ref mapRec.Right);
-                mapRec.music = ConvertDynamicLengthString(fileNum);
-                FileSystem.FileGet(fileNum, ref mapRec.BootMap);
-                FileSystem.FileGet(fileNum, ref mapRec.BootX);
-                FileSystem.FileGet(fileNum, ref mapRec.BootY);
-                FileSystem.FileGet(fileNum, ref mapRec.Shop);
-                FileSystem.FileGet(fileNum, ref mapRec.Indoors);
-                mapRec.Tile = Convert2DArray(fileNum, mapRec.Tile, true);
-                mapRec.Npc = ConvertArray(fileNum, mapRec.Npc, false);
-                mapRec.SpawnX = ConvertArray(fileNum, mapRec.SpawnX, false);
-                mapRec.SpawnY = ConvertArray(fileNum, mapRec.SpawnY, false);
-                FileSystem.FileGet(fileNum, ref mapRec.owner);
-                FileSystem.FileGet(fileNum, ref mapRec.scrolling);
-                FileSystem.FileGet(fileNum, ref mapRec.Weather);
+                mapRec.Name = new string(binaryReader.ReadChars(60));
+                mapRec.Revision = binaryReader.ReadInt16();
+                mapRec.Moral = binaryReader.ReadByte();
+                mapRec.Up = binaryReader.ReadInt16();
+                mapRec.Down = binaryReader.ReadInt16();
+                mapRec.Left = binaryReader.ReadInt16();
+                mapRec.Right = binaryReader.ReadInt16();
+
+                //The first two bytes contain the length of the string
+                //The second byte will always be 0 since we don't have names longer than 256 characters in SMBO
+                int length = binaryReader.ReadByte();
+                binaryReader.ReadByte();
+                if (length == 0)
+                {
+                    mapRec.music = string.Empty;
+                }
+                else mapRec.music = new string(binaryReader.ReadChars(length));
+
+                mapRec.BootMap = binaryReader.ReadInt16();
+                mapRec.BootX = binaryReader.ReadByte();
+                mapRec.BootY = binaryReader.ReadByte();
+                mapRec.Shop = binaryReader.ReadInt16();
+                mapRec.Indoors = binaryReader.ReadByte();
+
+                //The first two bytes of the multi-dimensional array are reserved for the rank, with the first byte telling it
+                binaryReader.ReadBytes(2);
+
+                //The next 64 bytes contain the length of the first rank, and the following 64 bytes contain the length of the second rank
+                binaryReader.ReadInt32();
+                binaryReader.ReadInt32();
+                binaryReader.ReadInt32();
+                binaryReader.ReadInt32();
+
+                //We're now at the tile data
+                for (int i = 0; i < mapRec.Tile.GetLength(0); i++)
+                {
+                    for (int j = 0; j < mapRec.Tile.GetLength(1); j++)
+                    {
+                        ReadTileData(ref mapRec.Tile[i, j], binaryReader);
+                    }
+                }
+
+                int val = 5;
+                int val2 = 23;
+                Console.WriteLine(mapRec.Tile[val, val2]);
+                
+                ////Get next available file num from freefile
+                //fileNum = FileSystem.FreeFile();
+
+                ////Console.WriteLine($"fileNum is {fileNum}");
+
+                //MapRec mapRec = new MapRec();
+
+                ////Read the data from the file
+                //FileSystem.FileOpen(fileNum, fileName, OpenMode.Binary);
+
+                ////Read in all data
+                //mapRec.Name = ConvertFixedLengthString(fileNum, 60);
+                //FileSystem.FileGet(fileNum, ref mapRec.Revision);
+                //FileSystem.FileGet(fileNum, ref mapRec.Moral);
+                //FileSystem.FileGet(fileNum, ref mapRec.Up);
+                //FileSystem.FileGet(fileNum, ref mapRec.Down);
+                //FileSystem.FileGet(fileNum, ref mapRec.Left);
+                //FileSystem.FileGet(fileNum, ref mapRec.Right);
+                //mapRec.music = ConvertDynamicLengthString(fileNum);
+                //FileSystem.FileGet(fileNum, ref mapRec.BootMap);
+                //FileSystem.FileGet(fileNum, ref mapRec.BootX);
+                //FileSystem.FileGet(fileNum, ref mapRec.BootY);
+                //FileSystem.FileGet(fileNum, ref mapRec.Shop);
+                //FileSystem.FileGet(fileNum, ref mapRec.Indoors);
+                //mapRec.Tile = Convert2DArray(fileNum, mapRec.Tile, true);
+                //mapRec.Npc = ConvertArray(fileNum, mapRec.Npc, false);
+                //mapRec.SpawnX = ConvertArray(fileNum, mapRec.SpawnX, false);
+                //mapRec.SpawnY = ConvertArray(fileNum, mapRec.SpawnY, false);
+                //FileSystem.FileGet(fileNum, ref mapRec.owner);
+                //FileSystem.FileGet(fileNum, ref mapRec.scrolling);
+                //FileSystem.FileGet(fileNum, ref mapRec.Weather);
 
                 return mapRec;
             }
@@ -97,9 +150,72 @@ namespace SMBOMapViewer
                 {
                     FileSystem.FileClose(fileNum);
                 }
+
+                if (binaryReader != null)
+                    binaryReader.Close();
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Reads in all data for a tile.
+        /// </summary>
+        /// <param name="tileRec">A TileRec, passed by reference, to be read in.</param>
+        /// <param name="reader">The BinaryReader reading in the data.</param>
+        private static void ReadTileData(ref TileRec tileRec, BinaryReader reader)
+        {
+            tileRec.Ground = reader.ReadInt32();
+            tileRec.Mask = reader.ReadInt32();
+            tileRec.Anim = reader.ReadInt32();
+            tileRec.Mask2 = reader.ReadInt32();
+            tileRec.M2Anim = reader.ReadInt32();
+            tileRec.Fringe = reader.ReadInt32();
+            tileRec.FAnim = reader.ReadInt32();
+            tileRec.Fringe2 = reader.ReadInt32();
+            tileRec.F2Anim = reader.ReadInt32();
+            tileRec.Type = reader.ReadByte();
+            tileRec.Data1 = reader.ReadInt32();
+            tileRec.Data2 = reader.ReadInt32();
+            tileRec.Data3 = reader.ReadInt32();
+
+            int length = reader.ReadByte();
+            reader.ReadByte();
+
+            //If the length is 0, the string itself will take up nothing in memory, but we should still set it to an empty one
+            if (length == 0)
+            {
+                tileRec.String1 = string.Empty;
+            }
+            else tileRec.String1 = new string(reader.ReadChars(length));
+
+            length = reader.ReadByte();
+            reader.ReadByte();
+            if (length == 0)
+            {
+                tileRec.String2 = string.Empty;
+            }
+            else tileRec.String2 = new string(reader.ReadChars(length));
+
+            length = reader.ReadByte();
+            reader.ReadByte();
+            if (length == 0)
+            {
+                tileRec.String3 = string.Empty;
+            }
+            else tileRec.String3 = new string(reader.ReadChars(length));
+
+            tileRec.light = reader.ReadInt32();
+
+            tileRec.GroundSet = reader.ReadByte();
+            tileRec.MaskSet = reader.ReadByte();
+            tileRec.AnimSet = reader.ReadByte();
+            tileRec.Mask2Set = reader.ReadByte();
+            tileRec.M2AnimSet = reader.ReadByte();
+            tileRec.FringeSet = reader.ReadByte();
+            tileRec.FAnimSet = reader.ReadByte();
+            tileRec.Fringe2Set = reader.ReadByte();
+            tileRec.F2AnimSet = reader.ReadByte();
         }
 
         /// <summary>
@@ -171,7 +287,7 @@ namespace SMBOMapViewer
             {
                 for (int j = 0; j < array.GetLength(1); j++)
                 {
-                    Console.WriteLine(array[i, j]);
+                    Console.WriteLine($"i: {i}, j: {j} - {array[i, j]}");
                 }
             }
         }

@@ -33,5 +33,7 @@ namespace SMBOMapViewer
         /// How often map animations are updated.
         /// </summary>
         public const double MAP_ANIM_TIMER = 250d;
+
+        public const string SCREENSHOT_FOLDER_NAME = "Screenshots";
     }
 }

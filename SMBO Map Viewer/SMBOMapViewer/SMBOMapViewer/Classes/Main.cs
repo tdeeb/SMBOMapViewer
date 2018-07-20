@@ -294,22 +294,9 @@ namespace SMBOMapViewer
                     //Save the RenderTexture
                     Texture2D tex = SpriteRenderer.Instance.RenderTarget;
 
-                    //Open the file dialogue so you can name the file and place it wherever you want
-                    System.Windows.Forms.SaveFileDialog dialogue = new System.Windows.Forms.SaveFileDialog();
-                    
-                    //Several maps have question marks in their names
-                    //Questions marks can't be in filenames, so if you encounter one, replace it with a space
-                    //If you try to save an invalid filename, there's no feedback, so this is how we're avoiding that problem
-                    dialogue.FileName = $"Map {MapNum} - {CurMap.Name.TrimEnd(' ').Replace('?', ' ')}";
-                    dialogue.Filter = "PNG (*.png)|*.png";
-
-                    if (dialogue.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    {
-                        using (FileStream fstream = new FileStream(dialogue.FileName, FileMode.Create))
-                        {
-                            tex.SaveAsPng(fstream, tex.Width, tex.Height);
-                        }
-                    }
+                    //Save the map
+                    SaveMapWindows(tex);
+                    //SaveMapNonWindows(tex);
                 }
             }
 
@@ -330,6 +317,66 @@ namespace SMBOMapViewer
         private void PostRender()
         {
 
+        }
+
+        private void SaveMapWindows(Texture2D tex)
+        {
+            //Open the file dialogue so you can name the file and place it wherever you want
+            System.Windows.Forms.SaveFileDialog dialogue = new System.Windows.Forms.SaveFileDialog();
+
+            //Several maps have question marks in their names
+            //Questions marks can't be in filenames, so if you encounter one, replace it with a space
+            //If you try to save an invalid filename, there's no feedback, so this is how we're avoiding that problem
+            dialogue.FileName = $"Map {MapNum} - {CurMap.Name.TrimEnd(' ').Replace('?', ' ')}";
+            dialogue.Filter = "PNG (*.png)|*.png";
+
+            if (dialogue.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                using (FileStream fstream = new FileStream(dialogue.FileName, FileMode.Create))
+                {
+                    tex.SaveAsPng(fstream, tex.Width, tex.Height);
+                }
+            }
+        }
+
+        private void SaveMapNonWindows(Texture2D tex)
+        {
+            /* Non-Windows platforms can't use System.Windows.Forms on Mono, so we'll put all screenshots in a dedicated folder */
+            string screenshotFolderPath = Path.Combine(Environment.CurrentDirectory, Constants.SCREENSHOT_FOLDER_NAME);
+
+            //Create the directory if it doesn't exist
+            if (Directory.Exists(screenshotFolderPath) == false)
+            {
+                Directory.CreateDirectory(screenshotFolderPath);
+            }
+
+            string fileName = $"Map {MapNum} - {CurMap.Name.TrimEnd(' ').Replace('?', ' ')}";
+            string filePath = Path.Combine(screenshotFolderPath, fileName);
+
+            int? index = null;
+
+            string finalPath = GetNextPath(filePath, index);
+
+            //Keep searching for the next file name
+            while (File.Exists(finalPath) == true)
+            {
+                if (index == null) index = 0;
+                else index++;
+
+                finalPath = GetNextPath(filePath, index);
+            }
+
+            //Save the file
+            using (FileStream fstream = new FileStream(finalPath, FileMode.Create))
+            {
+                tex.SaveAsPng(fstream, tex.Width, tex.Height);
+            }
+        }
+
+        private string GetNextPath(string curPath, int? index)
+        {
+            if (index == null) return curPath + ".png";
+            else return curPath + index + ".png";
         }
     }
 }

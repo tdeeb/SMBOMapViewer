@@ -26,7 +26,7 @@ Take a look at the [releases](https://github.com/tdeeb/SMBOMapViewer/releases) a
 * Press Space to take a screenshot of the currently displayed map. Map names with question marks in them are automatically replaced with spaces, since you cannot have a question mark in a file name. On Windows, you will be prompted what to name the file and where to save it. On Linux and OSX, screenshots will be placed in a newly created Screenshots folder in the same directory as the application, with the map name as the file name; it also supports multiple screenshots of the same map. As of the current version, the produced screenshot will ignore any manipulations to the camera, so you no longer need to reset the camera before taking a screenshot.
 
 ## Author(s)
-* **Thomas Deeb (aka Kimimaru)**
+* Kimimaru
 
 ## Acknowledgements
 * hydrakiller4000 (aka hydra) - helped track down the original data types used for holding maps and tiles.

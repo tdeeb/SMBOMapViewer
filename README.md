@@ -28,8 +28,5 @@ Take a look at the [releases](https://github.com/tdeeb/SMBOMapViewer/releases) a
 ## Author(s)
 * **Thomas Deeb (aka Kimimaru)**
 
-## License
-This project is licensed under the MIT License - see the LICENSE.md file for details.
-
 ## Acknowledgements
 * hydrakiller4000 (aka hydra) - helped track down the original data types used for holding maps and tiles.
